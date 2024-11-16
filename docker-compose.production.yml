@@ -37,7 +37,7 @@ services:
   nginx:
     container_name: foodgram-gateway
     env_file: .env
-    image: dimasik2401/foodgram-gateway
+    image: arsen551/foodgram-gateway
     ports:
       - "8080:80"
     volumes:
