@@ -19,24 +19,46 @@ class DisplayModelAdmin(admin.ModelAdmin):
     """Отображает все поля для любой модели."""
 
     def __init__(self, model, admin_site):
-        """Для отображения списка полей."""
+        """
+        Инициализация класса DisplayModelAdmin.
+
+        Аргументы:
+        model -- модель, для которой создается админ-интерфейс
+        admin_site -- экземпляр admin.site,
+        к которому относится данный админ-интерфейс
+
+        Для отображения списка полей используется
+        все поля модели, кроме поля 'id'.
+        """
         self.list_display = [
             field.name for field in model._meta.fields if field.name != 'id'
         ]
         super().__init__(model, admin_site)
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:  # Если объект уже существует (редактирование)
-            # Получаем все названия полей модели
+        """
+        Получает список полей, доступных только для чтения.
+
+        Аргументы:
+        request -- текущий HTTP запрос
+        obj -- объект модели для редактирования,
+        если это редактирование существующего объекта,
+        иначе None
+
+        Если объект уже существует (редактирование),
+        возвращает все поля модели как доступные
+        только для чтения.
+        В противном случае используется стандартный функционал.
+        """
+        if obj:
             return [field.name for field in self.model._meta.fields]
         return super().get_readonly_fields(request, obj)
-
-
 
 
 @admin.register(User)
 class UserAdmin(DisplayModelAdmin):
     """Администрирование пользователей."""
+
     search_fields = ('username', 'first_name',
                      'last_name', 'email'
                      )
@@ -71,14 +93,19 @@ class TagAdmin(DisplayModelAdmin):
 @admin.register(Ingredient)
 class IngredientAdmin(DisplayModelAdmin):
     """Администрирование ингредиентов."""
+
     search_fields = ('name',)
 
 
 class TagInline(admin.TabularInline):
+    """Администрирование тегов."""
+
     model = Recipe.tags.through
 
 
 class IngredientInline(admin.TabularInline):
+    """Администрирование ингредиентов."""
+
     model = Recipe.ingredients.through
 
 
@@ -86,16 +113,14 @@ class IngredientInline(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     """Администрирование рецептов."""
 
-    # Вывод полей в списке админки
     list_display = ('name', 'author',
                     'pub_date', 'preview_image',
                     'cooking_time'
                     )
     inlines = [TagInline,
                IngredientInline
-               ]  # Настройка inline моделей для тегов и ингредиентов
+               ]
 
-    # Метод для отображения миниатюры изображения
     def preview_image(self, obj):
         """Отображает миниатюру изображения рецепта в админке."""
         if obj.image:  # Проверяем, что у объекта есть изображение
@@ -115,6 +140,7 @@ class RecipeAdmin(admin.ModelAdmin):
                    'tags')  # Фильтрация по автору, дате и тегам
 
     def favorites_count(self, obj):
+        """Возвращает количество рецептов в избранном."""
         return obj.favorite_recipes.count()
 
 
