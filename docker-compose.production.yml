@@ -35,9 +35,9 @@ services:
       - backend
 
   nginx:
-    container_name: foodgram-gateway
+    container_name: foodgram-proxy
     env_file: .env
-    image: arsen551/foodgram-gateway
+    image: arsen551/foodgram_gateway
     ports:
       - "8080:80"
     volumes:
