@@ -14,7 +14,7 @@ services:
 
   backend:
     container_name: foodgram-back
-    image: arsen551/foodgram-backend
+    image: arsen551/foodgram_backend
     build: ../backend
     env_file: ../.env
     volumes:
@@ -27,7 +27,7 @@ services:
 
   frontend:
     container_name: foodgram-front
-    image: arsen551/foodgram-frontend
+    image: arsen551/foodgram_frontend
     build: ../frontend
     command: cp -r /app/build/. /frontend_static/
     volumes:
