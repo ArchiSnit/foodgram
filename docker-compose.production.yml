@@ -8,14 +8,14 @@ services:
   db:
     container_name: foodgram-db
     image: postgres:13
-    env_file: ../.env
+    env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
 
   backend:
     container_name: foodgram-back
     image: arsen551/foodgram-backend
-    env_file: ../.env
+    env_file: .env
     volumes:
       - static:/backend_static
       - media:/app/media
@@ -37,7 +37,7 @@ services:
 
   nginx:
     container_name: foodgram-proxy
-    env_file: ../.env
+    env_file: .env
     image: arsen551/foodgram_gateway
     ports:
       - "8080:80"
