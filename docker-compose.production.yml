@@ -35,7 +35,7 @@ services:
       - backend
 
   nginx:
-    image: dimasik2401/foodgram_gateway
+    image: arsen551/foodgram_gateway
     container_name: foodgram-proxy
 
     volumes:
