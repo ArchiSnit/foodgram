@@ -35,15 +35,11 @@ services:
       - backend
 
   nginx:
-    image: arsen551/foodgram-gateway
+    image: dimasik2401/foodgram_gateway
     container_name: foodgram-proxy
-    env_file: .env
+
+    volumes:
+      - static:/static/
+      - media:/media/
     ports:
       - 8080:80
-    volumes:
-      - static:/static
-      - media:/media
-      - docs:/usr/share/nginx/html/api/docs/
-    depends_on:
-      - backend
-      - frontend
