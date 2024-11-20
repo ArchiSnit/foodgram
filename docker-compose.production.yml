@@ -35,7 +35,11 @@ services:
       - backend
 
   nginx:
+<<<<<<< HEAD
     container_name: foodgram-gateway
+=======
+    container_name: foodgram-proxy
+>>>>>>> 11be5a85fbb26e94650b27c989338585e04037b9
     env_file: .env
     image: arsen551/foodgram_gateway
     ports:
@@ -48,5 +52,8 @@ services:
     depends_on:
       - backend
       - frontend
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 11be5a85fbb26e94650b27c989338585e04037b9
