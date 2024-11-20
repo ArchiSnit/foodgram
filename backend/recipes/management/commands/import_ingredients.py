@@ -46,6 +46,10 @@ class Command(BaseCommand):
             ('завтрак', 'breakfast'),
             ('обед', 'lunch'),
             ('ужин', 'dinner'),
+            ('закуски', 'snaks'),
+            ('напитки', 'drinks'),
+            ('алкогольные коктейли', 'alcoholic cocktails'),
+            ('выпечка', 'baked goods'),
         ]
         self.stdout.write('Начинаю загрузку тегов в базу...')
 

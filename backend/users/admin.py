@@ -1,16 +1,12 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 from django.utils.html import format_html
+from django.contrib.auth import get_user_model
 
-from recipes.models import (
-    Ingredient,
-    Recipe,
-    Subscription,
-    Tag,
-    ShopRecipe,
-    FavoriteRecipe,
-)
-
+from users.models import Subscription
+from recipes.models import (Tag, Ingredient,
+                            Recipe, ShoppingCart,
+                            FavoriteRecipe
+                            )
 
 User = get_user_model()
 
@@ -84,16 +80,16 @@ class UserAdmin(DisplayModelAdmin):
 class SubscriptionAdmin(DisplayModelAdmin):
     """Администрирование подписок."""
 
+    list_filter = ('user', 'cooker')
+    search_fields = ('user__username', 'cooker__username')
+
 
 @admin.register(Tag)
 class TagAdmin(DisplayModelAdmin):
     """Администрирование тегов."""
 
-
-@admin.register(Ingredient)
-class IngredientAdmin(DisplayModelAdmin):
-    """Администрирование ингредиентов."""
-
+    list_display = ('name', 'slug',)
+    list_filter = ('name',)
     search_fields = ('name',)
 
 
@@ -101,6 +97,15 @@ class TagInline(admin.TabularInline):
     """Администрирование тегов."""
 
     model = Recipe.tags.through
+
+
+@admin.register(Ingredient)
+class IngredientAdmin(DisplayModelAdmin):
+    """Администрирование ингредиентов."""
+
+    list_display = ('name', 'measurement_unit',)
+    list_filter = ('name',)
+    search_fields = ('name',)
 
 
 class IngredientInline(admin.TabularInline):
@@ -123,32 +128,36 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def preview_image(self, obj):
         """Отображает миниатюру изображения рецепта в админке."""
-        if obj.image:  # Проверяем, что у объекта есть изображение
+        if obj.image:
             return format_html('''
                 '<img src="{}" style="max-width: 100px; max-height: 100px;"/>'
                                '''.format(obj.image.url))
         return 'Нет изображения'
 
-    preview_image.short_description = 'Предпросмотр'  # Название столбца
+    preview_image.short_description = 'Предпросмотр'
 
     search_fields = ('name',
                      'author__username'
-                     )  # Поиск по имени рецепта и имени пользователя автора
+                     )
 
     list_filter = ('author',
                    'pub_date',
-                   'tags')  # Фильтрация по автору, дате и тегам
+                   'tags')
 
     def favorites_count(self, obj):
         """Возвращает количество рецептов в избранном."""
         return obj.favorite_recipes.count()
 
 
-@admin.register(ShopRecipe)
+@admin.register(ShoppingCart)
 class ShopRecipeAdmin(DisplayModelAdmin):
     """Администрирование покупок рецептов."""
+    list_filter = ('user', 'recipe')
+    search_fields = ('user__username', 'recipe__name')
 
 
 @admin.register(FavoriteRecipe)
 class FavoriteRecipeAdmin(DisplayModelAdmin):
     """Администрирование избранных рецептов."""
+    list_filter = ('user', 'recipe')
+    search_fields = ('user__username', 'recipe__name')

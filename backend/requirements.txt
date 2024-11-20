@@ -12,4 +12,5 @@ python-dotenv
 gunicorn
 django-filter==23.1
 short_url
-python-dotenv
+python-dotenv==0.21.0
+djangorestframework-simplejwt

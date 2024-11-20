@@ -140,3 +140,7 @@ dmypy.json
 
 static/
 media/
+
+# Игнорировать миграции
+   */migrations/*.py
+   */migrations/__init__.py

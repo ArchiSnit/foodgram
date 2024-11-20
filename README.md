@@ -45,7 +45,6 @@ python manage.py runserver
 
 
 
-
 docker compose exec backend python manage.py migrate
 
 docker compose exec backend python manage.py collectstatic
@@ -53,8 +52,9 @@ docker compose exec backend python manage.py collectstatic
 docker compose exec backend cp -r /app/collected_static/. /backend_static/static/
 
 
-
-
+docker push arsen551/foodgram_backend
+docker push arsen551/foodgram_frontend
+docker push arsen551/foodgram_gateway
 
 Авторство
 Фронтенд — команда Яндекс Практикума.

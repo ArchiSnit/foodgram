@@ -1,7 +1,7 @@
 # flake8: noqa 
 import os
 from pathlib import Path
-
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='secret_key')
 
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -93,7 +93,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -132,10 +131,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
@@ -143,18 +140,23 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    'HIDE_USERS': True,
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserPostSerializer',
         'user': 'api.serializers.UserGetSerializer',
         'current_user': 'api.serializers.UserGetSerializer',
     },
+    'TOKEN_MODEL': None,
+}
 
-    'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
-    },
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Время жизни access-токена
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Время жизни refresh-токена
+    'ROTATE_REFRESH_TOKENS': True,                 # Обновление refresh-токена
+    'BLACKLIST_AFTER_ROTATION': True,              # Аннулирование старого токена
+    'ALGORITHM': 'HS256',                          # Алгоритм шифрования
+    'SIGNING_KEY': SECRET_KEY,                     # Секретный ключ
+    'AUTH_HEADER_TYPES': ('Bearer',),              # Тип токена в заголовке
 }
 
 STATIC_URL = '/static/'
