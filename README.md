@@ -1,9 +1,38 @@
-В процессе заполнения 
 
 
-Находясь в папке infra, выполните команду docker-compose up. При выполнении этой команды контейнер frontend, описанный в docker-compose.yml, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
 
-По адресу http://localhost изучите фронтенд веб-приложения, а по адресу http://localhost/api/docs/ — спецификацию API.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Авторство
+Фронтенд — команда Яндекс Практикума.
+Бэкенд — Карапетян Арсен
+
 
 
 
@@ -42,7 +71,7 @@ python manage.py migrate
 python manage.py runserver
 
 
-
+python manage.py show_urls
 
 
 docker compose exec backend python manage.py migrate
@@ -52,10 +81,18 @@ docker compose exec backend python manage.py collectstatic
 docker compose exec backend cp -r /app/collected_static/. /backend_static/static/
 
 
+cd frontend  # В директории frontend...
+docker build -t arsen551/foodgram_frontend . 
+
+cd ../backend  # То же в директории backend...
+docker build -t arsen551/foodgram_backend .
+
+cd ../gateway  # ...то же и в gateway
+docker build -t arsen551/foodgram_gateway . 
+
+docker-compose up --build -d
+
 docker push arsen551/foodgram_backend
 docker push arsen551/foodgram_frontend
 docker push arsen551/foodgram_gateway
 
-Авторство
-Фронтенд — команда Яндекс Практикума.
-Бэкенд — Карапетян Арсен

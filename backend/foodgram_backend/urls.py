@@ -4,11 +4,18 @@ from django.contrib import admin
 from django.urls import include, path
 
 from api.views import short_link_view
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('<str:s>/', short_link_view),
+    path(
+        'redoc/',
+        TemplateView.as_view(template_name='redoc.html'),
+        name='redoc'
+    ),
 ]
 
 if settings.DEBUG:

@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from users.models import Subscription
 from recipes.models import (Tag, Ingredient,
                             Recipe, ShoppingCart,
-                            FavoriteRecipe
+                            FavoriteRecipe, TagRecipe, IngredientRecipe
                             )
 
 User = get_user_model()
@@ -66,7 +66,7 @@ class UserAdmin(DisplayModelAdmin):
 
     def preview_avatar(self, obj):
         """Отображает миниатюру аватара пользователя в админке."""
-        if obj.avatar:  # Проверяем, что у объекта есть аватар
+        if obj.avatar:
             return format_html('''
                 <img src="{}" style="max-width: 100px; max-height: 100px;"/>
                                '''.format(obj.avatar.url))
@@ -95,8 +95,7 @@ class TagAdmin(DisplayModelAdmin):
 
 class TagInline(admin.TabularInline):
     """Администрирование тегов."""
-
-    model = Recipe.tags.through
+    model = TagRecipe
 
 
 @admin.register(Ingredient)
@@ -111,7 +110,7 @@ class IngredientAdmin(DisplayModelAdmin):
 class IngredientInline(admin.TabularInline):
     """Администрирование ингредиентов."""
 
-    model = Recipe.ingredients.through
+    model = IngredientRecipe
 
 
 @admin.register(Recipe)

@@ -17,8 +17,6 @@ services:
     image: arsen551/foodgram_backend
     build: ../backend
     env_file: ../.env
-    environment:
-      - DJANGO_SETTINGS_MODULE=foodgram_backend.settings
     volumes:
       - static:/backend_static
       - media:/app/media

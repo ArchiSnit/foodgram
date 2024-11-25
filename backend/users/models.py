@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 
-from users.constants import USERNAME_REGEX
+from users.constants import (USERNAME_REGEX, MAX_LENGTH_USERNAME,
+                             MAX_LENGTH_F_NAME, MAX_LENGTH_L_NAME
+                             )
 
 
 class User(AbstractUser):
@@ -15,16 +17,16 @@ class User(AbstractUser):
                        )
     first_name = models.CharField(
         'Имя',
-        max_length=150
+        max_length=MAX_LENGTH_F_NAME
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=150
+        max_length=MAX_LENGTH_L_NAME
     )
     username = models.CharField(
         'Имя пользователя',
         unique=True,
-        max_length=150,
+        max_length=MAX_LENGTH_USERNAME,
         validators=[RegexValidator(
             regex=USERNAME_REGEX,
             message='Недопустимый символ'
@@ -35,7 +37,7 @@ class User(AbstractUser):
         blank=True,
         null=True,
         default=None,
-        upload_to='profiles'
+        upload_to='profiles/avatars/'
     )
     email = models.EmailField(
         'Адрес эл.почты',

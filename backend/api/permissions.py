@@ -1,34 +1,55 @@
+# from rest_framework import permissions
+
+# 
+# class IsAuthorOrReadOnly(permissions.BasePermission):
+#     """
+#     Разрешение: Только автор объекта может его изменять,
+#     остальные могут только просматривать. Также предоставляется доступ
+#     для суперпользователей и администраторов.
+#     """
+# 
+#     def has_object_permission(self, request, view, obj):
+#         """
+#         Проверяет права доступа для операций с объектом.
+#         """
+#         # Безопасные методы (GET, HEAD, OPTIONS) доступны всем.
+#         if request.method in permissions.SAFE_METHODS:
+#             return True
+# 
+#         # Суперпользователь всегда имеет доступ
+#         if request.user and request.user.is_superuser:
+#             return True
+# 
+#         # Проверяем доступ для администраторов или модераторов
+#         if request.user and (request.user.is_superuser or request.user.is_staff):
+#             return True
+# 
+#         # Доступ разрешён только автору объекта для остальных методов (POST, PUT, DELETE).
+#         return obj.author == request.user
+
+# class IsAuthorOrReadOnly(permissions.BasePermission):
+#     """
+#     Разрешение, позволяющее автору объекта изменять его,
+#     а для всех остальных — только читать.
+# 
+#     Пользователи могут выполнять только безопасные методы
+#     (GET, HEAD или OPTIONS), если они не являются автором объекта.
+#     """
+# 
+#     def has_object_permission(self, request, view, obj):
+#         return (request.method in permissions.SAFE_METHODS
+#                 or obj.author == request.user)
+
+# возможно нужен
+
 from rest_framework import permissions
-
-
-class OwnerOnly(permissions.BasePermission):
-    """
-    Разрешение, позволяющее доступ только владельцам объекта.
-    """
-
-    def has_object_permission(self, request, view, obj):
-        """
-        Проверяет, имеет ли пользователь разрешение на доступ к объекту.
-
-        :param request: HTTP-запрос.
-        :param view: Представление, обрабатывающее запрос.
-        :param obj: Объект, к которому проверяется доступ.
-        :return: True, если пользователь имеет доступ;
-        False в противном случае.
-        """
-        # Если метод запроса безопасный (GET, HEAD, OPTIONS), разрешаем доступ.
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # Для остальных методов (POST, PUT, DELETE) проверяем,
-        # является ли пользователь автором объекта.
-        return obj.author == request.user
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """
     Разрешение: Только автор объекта может его изменять,
-    остальные могут только просматривать.
+    остальные могут только просматривать. Также предоставляется доступ
+    для суперпользователей.
     """
 
     def has_object_permission(self, request, view, obj):
@@ -39,10 +60,23 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Суперпользователь всегда имеет доступ
-        if request.user and request.user.is_superuser:
+        # Если пользователь аутентифицирован
+        if request.user and request.user.is_authenticated:
+            # Суперпользователь всегда имеет доступ
+            if request.user.is_superuser:
+                return True
+
+            # Доступ разрешён только автору объекта для остальных методов (POST, PUT, DELETE).
+            return obj.author == request.user
+
+        # Неавторизованным пользователям доступ запрещён
+        return False
+
+
+class OwnerOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Для остальных методов (POST, PUT, DELETE).
-        # Доступ разрешён только автору объекта.
         return obj.author == request.user

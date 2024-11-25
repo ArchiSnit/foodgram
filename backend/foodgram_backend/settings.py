@@ -22,7 +22,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
@@ -126,13 +125,16 @@ USE_TZ = True
 
 
 AUTH_USER_MODEL = 'users.User'
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
@@ -140,23 +142,18 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
+    'HIDE_USERS': True,
     'LOGIN_FIELD': 'email',
-    'SERIALIZERS': {
-        'user_create': 'api.serializers.UserPostSerializer',
-        'user': 'api.serializers.UserGetSerializer',
-        'current_user': 'api.serializers.UserGetSerializer',
-    },
-    'TOKEN_MODEL': None,
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Время жизни access-токена
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Время жизни refresh-токена
-    'ROTATE_REFRESH_TOKENS': True,                 # Обновление refresh-токена
-    'BLACKLIST_AFTER_ROTATION': True,              # Аннулирование старого токена
-    'ALGORITHM': 'HS256',                          # Алгоритм шифрования
-    'SIGNING_KEY': SECRET_KEY,                     # Секретный ключ
-    'AUTH_HEADER_TYPES': ('Bearer',),              # Тип токена в заголовке
+    #'SERIALIZERS': {
+    #    'user_create': 'api.serializers.UserRegisterSerializer', 
+    #    'user': 'api.serializers.UserSerializer',                
+    #    'current_user': 'api.serializers.UserSerializer',        
+    #},
+#
+    #'PERMISSIONS': {
+    #    'user': ['rest_framework.permissions.AllowAny'],
+    #    'user_list': ['rest_framework.permissions.AllowAny'],
+    #},
 }
 
 STATIC_URL = '/static/'
