@@ -3,9 +3,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator
 
-from api.utils import Base64ImageField
 from users.models import Subscription
-
+from api.utils import Base64ImageField
 
 from recipes.models import (Tag, Ingredient,
                             Recipe, IngredientRecipe
@@ -231,8 +230,10 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
     """
     Сериализатор для создания и обновления рецептов.
 
-    Обрабатывает сериализацию данных рецепта, включая ингредиенты, теги, изображение,
-    название, текст и время приготовления. Поддерживает валидацию тегов и ингредиентов.
+    Обрабатывает сериализацию данных рецепта,
+    включая ингредиенты, теги, изображение,
+    название, текст и время приготовления.
+    Поддерживает валидацию тегов и ингредиентов.
     """
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True, required=True

@@ -1,7 +1,6 @@
 # flake8: noqa 
 import os
 from pathlib import Path
-from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -144,16 +143,16 @@ REST_FRAMEWORK = {
 DJOSER = {
     'HIDE_USERS': True,
     'LOGIN_FIELD': 'email',
-    #'SERIALIZERS': {
-    #    'user_create': 'api.serializers.UserRegisterSerializer', 
-    #    'user': 'api.serializers.UserSerializer',                
-    #    'current_user': 'api.serializers.UserSerializer',        
-    #},
-#
-    #'PERMISSIONS': {
-    #    'user': ['rest_framework.permissions.AllowAny'],
-    #    'user_list': ['rest_framework.permissions.AllowAny'],
-    #},
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.UserRegisterSerializer', 
+        'user': 'api.serializers.UserSerializer',                
+        'current_user': 'api.serializers.UserSerializer',        
+    },
+
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.AllowAny'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+    },
 }
 
 STATIC_URL = '/static/'

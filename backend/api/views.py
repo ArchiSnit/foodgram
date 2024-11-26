@@ -21,7 +21,7 @@ from api.serializers import (
 
 )
 from api.utils import create_shopping_list_pdf
-from api.filters import IngredientFilter, RecipeFilter
+from api.filters import RecipeFilter, IngredientFilter
 from api.paginators import LimitPageNumberPaginator
 from users.models import Subscription
 from django.contrib.auth import get_user_model
@@ -181,8 +181,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """Определяет разрешения в зависимости от метода запроса."""
         if self.action in ['list', 'retrieve']:
-            return [AllowAny()]  # Просмотр доступен всем.
-        return [IsAuthorOrReadOnly()]  # Все остальные действия только для авторизованных.
+            return [AllowAny()]
+        return [IsAuthorOrReadOnly()]
 
     def perform_create(self, serializer):
         """Добавление автора при создании рецепта."""
@@ -245,7 +245,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                                 ShoppingCart,
                                                 pk, error_msg)
 
-    @action(['post'], True, permission_classes=[IsAuthenticated],)
+    @action(['post'], True, url_path='favorite',
+            permission_classes=[IsAuthenticated],
+            )
     def favorite_recipe(self, request, pk=None):
         """Добавление рецепта в избранное."""
         return self.create_user_recipe_creation(request, FavoriteRecipe, pk)
