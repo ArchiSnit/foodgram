@@ -247,7 +247,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.delete_user_recipe_creation(request,
                                                 ShoppingCart,
                                                 pk, error_msg)
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
     def favorites(self, request):
         """Список избранных рецептов текущего пользователя."""
 
