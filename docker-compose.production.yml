@@ -41,7 +41,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - static:/staticfiles
+      - static:/static
       - media:/app/media
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/

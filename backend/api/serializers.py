@@ -75,9 +75,15 @@ class SubscripSerializer(serializers.ModelSerializer):
        Обрабатывает подписку пользователя на другого пользователя,
        включая валидацию уникальности подписок.
     """
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+    cooker = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = Subscription
-        fields = ('user', 'cooker')
+        fields = ('id', 'user', 'cooker')
         validators = (
             UniqueTogetherValidator(
                 queryset=Subscription.objects.all(),

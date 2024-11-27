@@ -108,8 +108,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
         """
         user = request.user
-        paginator = LimitPageNumberPaginator()
-        queryset = User.objects.filter(followers__user=user).annotate(
+        paginator = LimitPageNumberPaginator('limit')
+        queryset = User.objects.filter(followers__cooker=user).annotate(
             recipe_count=Count('recipes')).order_by('-id')
         paginated_queryset = paginator.paginate_queryset(queryset, request)
         serializer = RecipesForUser(paginated_queryset, many=True,
@@ -120,34 +120,37 @@ class UserViewSet(viewsets.ModelViewSet):
     def subscribe(self, request, pk=None):
         """
         Подписывает текущего пользователя на другого пользователя.
-
         """
         user = request.user
         user_to_follow = get_object_or_404(User, id=pk)
         serializer = SubscripSerializer(
-            data={'user': user.id, 'following': user_to_follow.id},
+            data={'user': user.id, 'cooker': user_to_follow.id},
             context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         obj = User.objects.annotate(recipes_count=Count('recipes')).get(id=pk)
-        serializer = RecipesForUser(obj, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response_serializer = RecipesForUser(obj,
+                                             context={'request': request})
+        return Response(response_serializer.data,
+                        status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
     def delete_subscription(self, request, pk=None):
         """
         Отменяет подписку текущего пользователя на другого пользователя.
-
         """
         user = request.user
         user_to_unfollow = get_object_or_404(User, id=pk)
-        if Subscription.objects.filter(
-                user=user, following=user_to_unfollow).exists():
-            Subscription.objects.filter(
-                user=user, following=user_to_unfollow).delete()
+
+        subscription = Subscription.objects.filter(
+            user=user, cooker=user_to_unfollow).first()
+
+        if subscription:
+            subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response('Вы не подписаны на этого пользователя.',
+
+        return Response({'detail': 'Вы не подписаны на этого пользователя.'},
                         status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -244,6 +247,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return self.delete_user_recipe_creation(request,
                                                 ShoppingCart,
                                                 pk, error_msg)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def favorites(self, request):
+        """Список избранных рецептов текущего пользователя."""
+
+        user = request.user
+        favorites = FavoriteRecipe.objects.filter(
+            user=user).select_related('recipe')
+
+        serializer = RecipeReadSerializer(favorites, many=True,
+                                          context={'request': request}
+                                          )
+        return Response(serializer.data)
 
     @action(['post'], True, url_path='favorite',
             permission_classes=[IsAuthenticated],

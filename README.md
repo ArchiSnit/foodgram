@@ -1,22 +1,7 @@
 [![Русский](https://img.shields.io/badge/Language-Русский-blue)](README.md)
 [![English](https://img.shields.io/badge/Language-English-blue)](README_EN.md)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# в процессе заполнения
 
 
 

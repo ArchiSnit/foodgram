@@ -8,3 +8,4 @@ class LimitPageNumberPaginator(PageNumberPagination):
     и позволяет задавать размер страницы через URL параметр 'limit'.
     """
     page_size_query_param = 'limit'
+    page_size = 5

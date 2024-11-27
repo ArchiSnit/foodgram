@@ -1,10 +1,10 @@
-from recipes.models import Recipe, Ingredient
+from recipes.models import Recipe, Ingredient, Tag
 
 from django_filters.rest_framework import (
     FilterSet,
     CharFilter,
     BooleanFilter,
-    MultipleChoiceFilter
+    ModelMultipleChoiceFilter
 )
 
 
@@ -19,7 +19,10 @@ class RecipeFilter(FilterSet):
     """
     is_in_shopping_cart = BooleanFilter(method='filter_is_in_shopping_cart')
     is_favorited = BooleanFilter(method='filter_is_favorited')
-    tags = MultipleChoiceFilter(field_name='tags__slug')
+    tags = ModelMultipleChoiceFilter(field_name='tags__slug',
+                                     queryset=Tag.objects.all(),
+                                     to_field_name='slug',
+                                     )
 
     class Meta:
 
@@ -49,7 +52,7 @@ class RecipeFilter(FilterSet):
         """
         user = self.request.user
         if user.is_authenticated and value:
-            return queryset.filter(cart__user=user)
+            return queryset.exclude(cart_set__user=user)
         return queryset
 
 
