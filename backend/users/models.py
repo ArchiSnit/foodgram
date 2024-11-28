@@ -38,7 +38,7 @@ class User(AbstractUser):
         null=True,
         default=None,
         upload_to='profiles/avatars/'
-    ) 
+    )
     email = models.EmailField(
         'Адрес эл.почты',
         unique=True,
