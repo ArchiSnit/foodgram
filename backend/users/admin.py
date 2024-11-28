@@ -1,12 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.auth import get_user_model
-
 from users.models import Subscription
-from recipes.models import (Tag, Ingredient,
-                            Recipe, ShoppingCart,
-                            FavoriteRecipe, TagRecipe, IngredientRecipe
-                            )
 
 User = get_user_model()
 
@@ -64,6 +59,7 @@ class UserAdmin(DisplayModelAdmin):
                     'last_name', 'email', 'preview_avatar'
                     )
 
+    @admin.display(description='Предпросмотр')
     def preview_avatar(self, obj):
         """Отображает миниатюру аватара пользователя в админке."""
         if obj.avatar:
@@ -82,81 +78,3 @@ class SubscriptionAdmin(DisplayModelAdmin):
 
     list_filter = ('user', 'cooker')
     search_fields = ('user__username', 'cooker__username')
-
-
-@admin.register(Tag)
-class TagAdmin(DisplayModelAdmin):
-    """Администрирование тегов."""
-
-    list_display = ('name', 'slug',)
-    list_filter = ('name',)
-    search_fields = ('name',)
-
-
-class TagInline(admin.TabularInline):
-    """Администрирование тегов."""
-    model = TagRecipe
-
-
-@admin.register(Ingredient)
-class IngredientAdmin(DisplayModelAdmin):
-    """Администрирование ингредиентов."""
-
-    list_display = ('name', 'measurement_unit',)
-    list_filter = ('name',)
-    search_fields = ('name',)
-
-
-class IngredientInline(admin.TabularInline):
-    """Администрирование ингредиентов."""
-
-    model = IngredientRecipe
-
-
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    """Администрирование рецептов."""
-
-    list_display = ('name', 'author',
-                    'pub_date', 'preview_image',
-                    'cooking_time'
-                    )
-    inlines = [TagInline,
-               IngredientInline
-               ]
-
-    def preview_image(self, obj):
-        """Отображает миниатюру изображения рецепта в админке."""
-        if obj.image:
-            return format_html('''
-                '<img src="{}" style="max-width: 100px; max-height: 100px;"/>'
-                               '''.format(obj.image.url))
-        return 'Нет изображения'
-
-    preview_image.short_description = 'Предпросмотр'
-
-    search_fields = ('name',
-                     'author__username'
-                     )
-
-    list_filter = ('author',
-                   'pub_date',
-                   'tags')
-
-    def favorites_count(self, obj):
-        """Возвращает количество рецептов в избранном."""
-        return obj.favorite_recipes.count()
-
-
-@admin.register(ShoppingCart)
-class ShopRecipeAdmin(DisplayModelAdmin):
-    """Администрирование покупок рецептов."""
-    list_filter = ('user', 'recipe')
-    search_fields = ('user__username', 'recipe__name')
-
-
-@admin.register(FavoriteRecipe)
-class FavoriteRecipeAdmin(DisplayModelAdmin):
-    """Администрирование избранных рецептов."""
-    list_filter = ('user', 'recipe')
-    search_fields = ('user__username', 'recipe__name')

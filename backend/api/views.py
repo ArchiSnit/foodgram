@@ -1,5 +1,5 @@
 import short_url
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Prefetch
 from djoser.serializers import SetPasswordSerializer
 
 from rest_framework.response import Response
@@ -26,6 +26,7 @@ from users.models import Subscription
 from django.contrib.auth import get_user_model
 
 from recipes.models import (Tag, Ingredient, Recipe,
+                            IngredientRecipe,
                             FavoriteRecipe, ShoppingCart
                             )
 
@@ -174,7 +175,12 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     """Общий ViewSet рецептов"""
     queryset = Recipe.objects.prefetch_related(
-        'tags', 'ingredients').select_related('author')
+        'tags',
+        Prefetch(
+            'recipe_ingredients',
+            queryset=IngredientRecipe.objects.select_related('ingredient'))
+    ).select_related('author')
+
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ('get', 'post', 'patch', 'delete')

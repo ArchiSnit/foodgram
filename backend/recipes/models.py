@@ -70,9 +70,9 @@ class Tag(models.Model):
 class Recipe(BaseEntity):
     """Модель рецепта, содержащая название,
        описание, ингредиенты, теги и другую информацию."""
-    tags = models.ManyToManyField(Tag, through='TagRecipe', verbose_name='Тег')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                verbose_name='Автор')
+    tags = models.ManyToManyField(Tag, verbose_name='Тег')
     ingredients = models.ManyToManyField(
         Ingredient, through='IngredientRecipe'
     )

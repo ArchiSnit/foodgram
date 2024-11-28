@@ -16,11 +16,12 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        if request.user and request.user.is_authenticated:
-            if request.user.is_superuser:
-                return True
-            return obj.author == request.user
-        return False
+        # Проверка, аутентифицирован ли пользователь и является ли он
+        # суперпользователем или автором объекта.
+        return request.user.is_authenticated and (
+            request.user.is_superuser or obj.author == request.user)
+
+
 
 
 # class OwnerOnly(permissions.BasePermission):
