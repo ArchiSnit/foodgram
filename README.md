@@ -116,14 +116,7 @@ markdown
 🎉 **Присоединяйтесь к Foodgram!**   
 Делитесь своими кулинарными идеями и вдохновляйтесь рецептами других! 🍲✨
 
-cd frontend  # В директории frontend...
-docker build -t arsen551/foodgram_frontend . 
 
-cd ../backend  # То же в директории backend...
-docker build -t arsen551/foodgram_backend .
-
-cd ../gateway  # ...то же и в gateway
-docker build -t arsen551/foodgram_gateway . 
 
 docker-compose up --build -d
 
