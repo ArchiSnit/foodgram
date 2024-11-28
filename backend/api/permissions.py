@@ -20,22 +20,3 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         # суперпользователем или автором объекта.
         return request.user.is_authenticated and (
             request.user.is_superuser or obj.author == request.user)
-
-
-
-
-# class OwnerOnly(permissions.BasePermission):
-#     """
-#     Разрешение, которое позволяет доступ только владельцам ресурса.
-#
-#     Для безопасных методов (GET, HEAD, OPTIONS)
-#     доступ предоставляется всем пользователям.
-#     Для остальных методов проверяется,
-#     является ли текущий пользователь автором данного объекта.
-#     """
-#     def has_object_permission(self, view, request, obj):
-#         if request.method in permissions.SAFE_METHODS:
-#             return True
-#
-#         return obj.author == request.user
-#

@@ -61,6 +61,7 @@ class TagInline(admin.TabularInline):
     min_num = 1
     extra = 0
 
+
 @admin.register(Ingredient)
 class IngredientAdmin(DisplayModelAdmin):
     """Администрирование ингредиентов."""
