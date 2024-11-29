@@ -118,8 +118,3 @@ markdown
 
 
 
-docker-compose up --build -d
-
-docker push arsen551/foodgram_backend
-docker push arsen551/foodgram_frontend
-docker push arsen551/foodgram_gateway
