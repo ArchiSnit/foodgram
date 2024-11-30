@@ -249,9 +249,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def delete_from_shopping_cart(self, request, pk=None):
         """Удаление рецепта из корзины."""
         if not request.user.is_authenticated:
-            return Response({"detail": "Учетные данные для аутентификации не были предоставлены."},
-                            status=status.HTTP_401_UNAUTHORIZED)
-        
+            return Response(
+                {
+                    "detail": (
+                        "Учетные данные для аутентификации не были "
+                        "предоставлены.")
+                },
+                status=status.HTTP_401_UNAUTHORIZED)
+
         error_msg = 'Рецепт не был добавлен в корзину.'
         return self.delete_user_recipe_creation(request,
                                                 ShoppingCart,
@@ -282,11 +287,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def delete_from_favorite(self, request, pk=None):
         """Удаление рецепта из избранного."""
         if not request.user.is_authenticated:
-            return Response({"detail": "Учетные данные для аутентификации не были предоставлены."},
-                            status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "detail": (
+                        "Учетные данные для аутентификации не были "
+                        "предоставлены.")
+                },
+                status=status.HTTP_401_UNAUTHORIZED)
 
         error_msg = 'Рецепт не был добавлен в избранное.'
-        return self.delete_user_recipe_creation(request, FavoriteRecipe, pk, error_msg)
+        return self.delete_user_recipe_creation(request,
+                                                FavoriteRecipe,
+                                                pk, error_msg
+                                                )
 
     @action(['get'], True, permission_classes=[AllowAny],
             url_path='get-link')
