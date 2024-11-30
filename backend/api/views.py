@@ -4,7 +4,7 @@ from djoser.serializers import SetPasswordSerializer
 
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from django.shortcuts import redirect, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from api.permissions import IsAuthorOrReadOnly
