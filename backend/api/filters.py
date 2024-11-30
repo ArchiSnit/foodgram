@@ -39,7 +39,7 @@ class RecipeFilter(FilterSet):
         """
         user = self.request.user
         if user.is_authenticated and value:
-            return queryset.filter(favorite__user=user)
+            return queryset.filter(favorites__user=user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
@@ -52,7 +52,7 @@ class RecipeFilter(FilterSet):
         """
         user = self.request.user
         if user.is_authenticated and value:
-            return queryset.exclude(cart_set__user=user)
+            return queryset.filter(cart_set__user=user)
         return queryset
 
 

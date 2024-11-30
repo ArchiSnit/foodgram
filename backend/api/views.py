@@ -4,7 +4,7 @@ from djoser.serializers import SetPasswordSerializer
 
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from django.shortcuts import redirect, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from api.permissions import IsAuthorOrReadOnly
@@ -60,7 +60,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(user, context={'request': request})
         return Response(serializer.data)
 
-    @action(['post'], detail=False)
+    @action(['post'], detail=False, permission_classes=[IsAuthenticated])
     def set_password(self, request):
         """
         Устанавливает новый пароль для текущего пользователя.
@@ -108,12 +108,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
         """
         user = request.user
-        paginator = LimitPageNumberPaginator('limit')
+        paginator = LimitPageNumberPaginator()
         queryset = User.objects.filter(followers__cooker=user).annotate(
             recipe_count=Count('recipes')).order_by('-id')
         paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = RecipesForUser(paginated_queryset, many=True,
-                                    context={'request': request})
+        serializer = SubscripSerializer(paginated_queryset, many=True,
+                                        context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
     @action(['post'], detail=True, permission_classes=[IsAuthenticated])
@@ -135,7 +135,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(response_serializer.data,
                         status=status.HTTP_201_CREATED)
 
-    @subscribe.mapping.delete
+    @action(['delete'], detail=True, permission_classes=[IsAuthenticated])
     def delete_subscription(self, request, pk=None):
         """
         Отменяет подписку текущего пользователя на другого пользователя.
@@ -181,7 +181,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset=IngredientRecipe.objects.select_related('ingredient'))
     ).select_related('author')
 
-    filter_backends = (DjangoFilterBackend,)
+    # filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ('get', 'post', 'patch', 'delete')
     # permission_classes = [IsAuthorOrReadOnly]
@@ -202,7 +202,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeCreateUpdateSerializer
 
-    @action(['get'], False, permission_classes=[IsAuthenticated],)
+    @action(['get'], detail=False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         """
         Скачивание списка покупок в формате PDF.
@@ -248,6 +248,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @shopping_cart.mapping.delete
     def delete_from_shopping_cart(self, request, pk=None):
         """Удаление рецепта из корзины."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Учетные данные для аутентификации не были предоставлены."},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        
         error_msg = 'Рецепт не был добавлен в корзину.'
         return self.delete_user_recipe_creation(request,
                                                 ShoppingCart,
@@ -277,9 +281,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @favorite_recipe.mapping.delete
     def delete_from_favorite(self, request, pk=None):
         """Удаление рецепта из избранного."""
+        if not request.user.is_authenticated:
+            return Response({"detail": "Учетные данные для аутентификации не были предоставлены."},
+                            status=status.HTTP_401_UNAUTHORIZED)
+
         error_msg = 'Рецепт не был добавлен в избранное.'
-        return self.delete_user_recipe_creation(request, FavoriteRecipe, pk,
-                                                error_msg)
+        return self.delete_user_recipe_creation(request, FavoriteRecipe, pk, error_msg)
 
     @action(['get'], True, permission_classes=[AllowAny],
             url_path='get-link')

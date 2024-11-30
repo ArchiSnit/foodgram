@@ -50,7 +50,6 @@ class DisplayModelAdmin(admin.ModelAdmin):
 class TagAdmin(DisplayModelAdmin):
     """Администрирование тегов."""
     list_display = ('name', 'slug',)
-    list_filter = ('name',)
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
 
@@ -66,7 +65,6 @@ class TagInline(admin.TabularInline):
 class IngredientAdmin(DisplayModelAdmin):
     """Администрирование ингредиентов."""
     list_display = ('name', 'measurement_unit',)
-    list_filter = ('name',)
     search_fields = ('name',)
 
 
