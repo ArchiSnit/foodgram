@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework.validators import UniqueTogetherValidator
 
-from users.models import Subscription
+from users.models import Subscribtion
 from api.utils import Base64ImageField
 
 from recipes.models import (Tag, Ingredient,
@@ -70,29 +70,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class SubscripSerializer(serializers.ModelSerializer):
+class SubscribSerializer(serializers.ModelSerializer):
     """Сериализатор подписки
        Обрабатывает подписку пользователя на другого пользователя,
        включая валидацию уникальности подписок.
     """
-    user = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault()
-    )
-    cooker = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
     class Meta:
-        model = Subscription
-        fields = ('id', 'user', 'cooker')
+        model = Subscribtion
+        fields = ('id', 'user', 'following')
         validators = (
             UniqueTogetherValidator(
-                queryset=Subscription.objects.all(),
-                fields=('user', 'cooker'),
+                queryset=Subscribtion.objects.all(),
+                fields=('user', 'following'),
                 message='Вы уже подписаны на этого пользователя'
             ),
         )
 
-    def validate_cooker(self, value):
+    def validate_following(self, value):
         if self.context['request'].user == value:
             raise serializers.ValidationError(
                 'Нельзя подписываться на самого себя')

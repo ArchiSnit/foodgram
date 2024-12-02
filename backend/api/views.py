@@ -1,10 +1,11 @@
 import short_url
+from django.conf import settings
 from django.db.models import Sum, Count, Prefetch
 from djoser.serializers import SetPasswordSerializer
 
 from rest_framework.response import Response
 from rest_framework import viewsets, status
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from django.shortcuts import redirect, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from api.permissions import IsAuthorOrReadOnly
@@ -12,7 +13,7 @@ from rest_framework.permissions import (AllowAny,
                                         IsAuthenticated,
                                         )
 from api.serializers import (
-    AvatarSerializer, IngredientSerializer, SubscripSerializer,
+    AvatarSerializer, IngredientSerializer, SubscribSerializer,
     RecipeCreateUpdateSerializer, RecipeReadSerializer,
     TagSerializer, UserRecipeCreationSerializer,
     UserRegisterSerializer, UserSerializer, RecipesForUser
@@ -22,7 +23,7 @@ from api.serializers import (
 from api.utils import create_shopping_list_pdf
 from api.filters import RecipeFilter, IngredientFilter
 from api.paginators import LimitPageNumberPaginator
-from users.models import Subscription
+from users.models import Subscribtion
 from django.contrib.auth import get_user_model
 
 from recipes.models import (Tag, Ingredient, Recipe,
@@ -50,6 +51,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
+    pagination_class = LimitPageNumberPaginator
 
     @action(['get'], detail=False, permission_classes=[IsAuthenticated])
     def me(self, request):
@@ -108,12 +110,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
         """
         user = request.user
-        paginator = LimitPageNumberPaginator()
-        queryset = User.objects.filter(followers__cooker=user).annotate(
+        paginator = self.pagination_class()
+        queryset = User.objects.filter(followers__user=user).annotate(
             recipe_count=Count('recipes')).order_by('-id')
         paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = SubscripSerializer(paginated_queryset, many=True,
-                                        context={'request': request})
+        serializer = RecipesForUser(paginated_queryset, many=True,
+                                    context={'request': request})
         return paginator.get_paginated_response(serializer.data)
 
     @action(['post'], detail=True, permission_classes=[IsAuthenticated])
@@ -123,8 +125,8 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         user = request.user
         user_to_follow = get_object_or_404(User, id=pk)
-        serializer = SubscripSerializer(
-            data={'user': user.id, 'cooker': user_to_follow.id},
+        serializer = SubscribSerializer(
+            data={'user': user.id, 'following': user_to_follow.id},
             context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
@@ -135,7 +137,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(response_serializer.data,
                         status=status.HTTP_201_CREATED)
 
-    @action(['delete'], detail=True, permission_classes=[IsAuthenticated])
+    @subscribe.mapping.delete
     def delete_subscription(self, request, pk=None):
         """
         Отменяет подписку текущего пользователя на другого пользователя.
@@ -143,11 +145,11 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         user_to_unfollow = get_object_or_404(User, id=pk)
 
-        subscription = Subscription.objects.filter(
-            user=user, cooker=user_to_unfollow).first()
+        subscribtion = Subscribtion.objects.filter(
+            user=user, following=user_to_unfollow).first()
 
-        if subscription:
-            subscription.delete()
+        if subscribtion:
+            subscribtion.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response({'detail': 'Вы не подписаны на этого пользователя.'},
@@ -181,10 +183,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             queryset=IngredientRecipe.objects.select_related('ingredient'))
     ).select_related('author')
 
-    # filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     http_method_names = ('get', 'post', 'patch', 'delete')
     # permission_classes = [IsAuthorOrReadOnly]
+    pagination_class = LimitPageNumberPaginator
 
     def get_permissions(self):
         """Определяет разрешения в зависимости от метода запроса."""
@@ -264,16 +266,22 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
-    def favorites(self, request):
+    def favorite(self, request):
         """Список избранных рецептов текущего пользователя."""
 
         user = request.user
-        favorites = FavoriteRecipe.objects.filter(
-            user=user).select_related('recipe')
+        queryset = Recipe.objects.filter(favorites__user=user).select_related(
+            'author'
+        ).prefetch_related('tags', 'recipe_ingredients__ingredient')
 
-        serializer = RecipeReadSerializer(favorites, many=True,
-                                          context={'request': request}
-                                          )
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = RecipeReadSerializer(page, many=True,
+                                              context={'request': request})
+            return self.get_paginated_response(serializer.data)
+
+        serializer = RecipeReadSerializer(queryset, many=True,
+                                          context={'request': request})
         return Response(serializer.data)
 
     @action(['post'], True, url_path='favorite',
@@ -305,11 +313,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_path='get-link')
     def get_link(self, request, pk=None):
         """
-        Генерация короткой ссылки на рецепт.
-        Возвращает короткую ссылку в формате:
-        https://<домен>/s/<короткая ссылка>.
+        Получение короткой ссылки,
+        по первому значению в ALLOWED_HOSTS
         """
-        domain = request.get_host()
-        s_url = short_url.encode_url(int(pk))
-        url = f'https://{domain}/s/{s_url}'
+        url = 'http://{}/s/{}/'.format(
+            settings.ALLOWED_HOSTS[0],
+            short_url.encode_url(int(pk))
+        )
         return Response({'short-link': url}, status=status.HTTP_200_OK)

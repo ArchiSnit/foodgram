@@ -54,27 +54,25 @@ class User(AbstractUser):
         return self.username
 
 
-class Subscription(models.Model):
+class Subscribtion(models.Model):
     """Подписка пользователя на пользователя"""
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name='following',
-        verbose_name='Пользователь')
-    cooker = models.ForeignKey(
-        User, on_delete=models.CASCADE,
-        related_name='followers',
-        verbose_name='Повар')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='following',
+                             verbose_name='Пользователь'
+                             )
+
+    following = models.ForeignKey(User, on_delete=models.CASCADE,
+                                  related_name='followers',
+                                  verbose_name='Подписчик'
+                                  )
 
     class Meta:
-        ordering = ('user',)
-        verbose_name = 'подипска'
+        verbose_name = 'подписка'
         verbose_name_plural = 'Подписки'
         constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'cooker'],
-                name='unique_user_cooker'
-            )
+            models.UniqueConstraint(fields=['user', 'following'],
+                                    name='unique_following'),
         ]
 
     def __str__(self):
-        return f'{self.user} подписан(а) на {self.cooker}'
+        return f'{self.user.username} подписан на {self.following.username}'

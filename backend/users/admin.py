@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib.auth import get_user_model
-from users.models import Subscription
+from users.models import Subscribtion
 
 User = get_user_model()
 
@@ -72,9 +72,9 @@ class UserAdmin(DisplayModelAdmin):
     preview_avatar.short_description = 'Предпросмотр аватара'
 
 
-@admin.register(Subscription)
-class SubscriptionAdmin(DisplayModelAdmin):
+@admin.register(Subscribtion)
+class SubscribtionAdmin(DisplayModelAdmin):
     """Администрирование подписок."""
 
-    list_filter = ('user', 'cooker')
-    search_fields = ('user__username', 'cooker__username')
+    list_filter = ('user', 'following')
+    search_fields = ('user__username', 'following__username')

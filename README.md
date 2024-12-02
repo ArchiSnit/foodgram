@@ -46,41 +46,18 @@ markdown
 
    **Пример**:
 
-   SECRET_KEY='django-insecure-!65y-r4+hsr!9xgb+d5=r+!!wk3(8^x58i#f)y_&=owq9q!b08'
-
-
+SECRET_KEY='your_secret_key'
    DEBUG=True
-
-
-   ALLOWED_HOSTS='food-graminia.hopto.org,127.0.0.1,localhost,84.201.142.83'
-
-
-   POSTGRES_USER=foodgram_user
-
-
-   POSTGRES_PASSWORD=foodgram_password
-
-
-   DB_NAME=foodgram
-
-
-   POSTGRES_DB=foodgram
-
-
-   DJANGO_SUPERUSER_EMAIL=4yva4ok8@gmail.com
-
-
-   DJANGO_SUPERUSER_USERNAME=Admin
-
-
-   DJANGO_SUPERUSER_FIRST_NAME=Arsen
-
-
-   DJANGO_SUPERUSER_SECOND_NAME=K
-
-
-   DJANGO_SUPERUSER_PASSWORD=4815162342Admin1
-
+   ALLOWED_HOSTS='your_allowed_hosts'
+   POSTGRES_USER='your_postgres_user'
+   POSTGRES_PASSWORD='your_postgres_password'
+   DB_NAME='your_db_name'
+   POSTGRES_DB='your_postgres_db'
+   DJANGO_SUPERUSER_EMAIL='your_superuser_email'
+   DJANGO_SUPERUSER_USERNAME='your_superuser_username'
+   DJANGO_SUPERUSER_FIRST_NAME='your_superuser_first_name'
+   DJANGO_SUPERUSER_SECOND_NAME='your_superuser_second_name'
+   DJANGO_SUPERUSER_PASSWORD='your_superuser_password'
 
    
 
